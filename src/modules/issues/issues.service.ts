@@ -24,9 +24,31 @@ const createIssueIntoDB = async (payload: ICreateIssuePayload) => {
   return result;
 };
 
-const getAllIssuesFromDB = async () => {
+const getAllIssuesFromDB = async (filters: {
+  type?: string;
+  status?: string;
+  sort?: string;
+}) => {
+  const conditions: string[] = [];
+  const values: string[] = [];
+
+  if (filters.type) {
+    values.push(filters.type);
+    conditions.push(`type = $${values.length}`);
+  }
+
+  if (filters.status) {
+    values.push(filters.status);
+    conditions.push(`status = $${values.length}`);
+  }
+
+  const where =
+    conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
+  const order = filters.sort === "asc" ? "ASC" : "DESC";
+
   const result = await pool.query(
-    `SELECT * FROM issues ORDER BY created_at DESC`,
+    `SELECT * FROM issues ${where} ORDER BY created_at ${order}`,
+    values,
   );
   return result;
 };
