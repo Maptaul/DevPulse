@@ -10,6 +10,7 @@ import { pool } from "./db";
 import globalErrorHandler from "./middleware/globalError";
 import sendResponse from "./utility/sendResponse";
 import { userRoute } from "./modules/users/user.route";
+import { issueRoute } from "./modules/issues/issues.route";
 
 const app: Application = express();
 
@@ -34,8 +35,8 @@ app.get("/", (req: Request, res: Response) => {
   });
 });
 
-
 app.use("/api/users", userRoute);
+app.use("/api/issues", issueRoute);
 
 app.use(globalErrorHandler);
 
