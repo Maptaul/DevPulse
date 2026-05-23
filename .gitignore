@@ -1,0 +1,52 @@
+### OS files ###
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+### IDE / Editor ###
+.vscode/
+.idea/
+*.swp
+*.swo
+
+### Logs ###
+*.log
+logs/
+
+### Environment / Secrets ###
+.env
+.env.*
+!.env.example
+
+### Dependencies ###
+node_modules/
+
+### Build outputs ###
+dist/
+build/
+out/
+coverage/
+
+### Cache ###
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+.svelte-kit/
+
+### Python ###
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.venv/
+venv/
+
+### Misc ###
+*.tmp
+*.temp
+
+
+AGENTS.md
