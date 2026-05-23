@@ -6,11 +6,12 @@ import express, {
 
 import CookieParser from "cookie-parser";
 import cors from "cors";
-import { pool } from "./db";
+
 import globalErrorHandler from "./middleware/globalError";
 import sendResponse from "./utility/sendResponse";
 import { userRoute } from "./modules/users/user.route";
 import { issueRoute } from "./modules/issues/issues.route";
+import { authRoute } from "./modules/auth/auth.route";
 
 const app: Application = express();
 
@@ -37,6 +38,7 @@ app.get("/", (req: Request, res: Response) => {
 
 app.use("/api/users", userRoute);
 app.use("/api/issues", issueRoute);
+app.use("/api/auth", authRoute);
 
 app.use(globalErrorHandler);
 
