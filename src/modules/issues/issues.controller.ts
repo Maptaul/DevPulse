@@ -1,9 +1,8 @@
-import type { NextFunction } from "express";
+import type { NextFunction, Request, Response } from "express";
 import sendResponse from "../../utility/sendResponse";
 import { issueService } from "./issues.service";
 
 const createIssue = async (req: Request, res: Response, next: NextFunction) => {
- 
   try {
     const result = await issueService.createIssueIntoDB(req.body);
     sendResponse(res, {
@@ -18,5 +17,5 @@ const createIssue = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const issueController = {
-        createIssue,
+  createIssue,
 };
