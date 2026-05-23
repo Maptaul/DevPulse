@@ -2,11 +2,18 @@ export type IssueType = "bug" | "feature_request";
 export type IssueStatus = "open" | "in_progress" | "resolved";
 
 export interface ICreateIssuePayload {
-  title: string; // max 150 chars (enforced at DB level)
-  description: string; // min 20 chars (enforced at DB level)
+  title: string; 
+  description: string; 
   type: IssueType;
-  status?: IssueStatus; // optional, defaults to 'open'
+  status?: IssueStatus; 
   reporter_id: number;
+}
+
+export interface IUpdateIssuePayload {
+  title?: string;
+  description?: string;
+  type?: IssueType;
+  status?: IssueStatus;
 }
 
 export interface IIssue {
