@@ -54,7 +54,7 @@ const loginUserIntoDB = async (payload: ILoginPayload) => {
     expiresIn: "1h",
   });
 
-  return { user, accessToken };
+  return { accessToken };
 };
 
 export const authService = {
