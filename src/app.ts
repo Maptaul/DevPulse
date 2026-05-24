@@ -1,5 +1,6 @@
 import express, {
   type Application,
+  type NextFunction,
   type Request,
   type Response,
 } from "express";
@@ -12,6 +13,7 @@ import sendResponse from "./utility/sendResponse";
 import { userRoute } from "./modules/users/user.route";
 import { issueRoute } from "./modules/issues/issues.route";
 import { authRoute } from "./modules/auth/auth.route";
+import logger from "./middleware/logger";
 
 const app: Application = express();
 
@@ -27,6 +29,8 @@ app.use(
     origin: "http://localhost:3000",
   }),
 );
+
+app.use(logger);
 
 app.get("/", (req: Request, res: Response) => {
   sendResponse(res, {
