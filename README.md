@@ -115,7 +115,7 @@ Login sets a `refreshToken` cookie (httpOnly). Example flows using `curl`:
 - Login (store cookies in `cookies.txt`):
 
 ```bash
-curl -X POST https://your-api.example.com/api/auth/login \
+curl -X POST https://dev-pulse-navy.vercel.app/api/auth/login \
   -H "Content-Type: application/json" \
   -c cookies.txt \
   -d '{"email":"user@example.com","password":"password"}'
@@ -124,7 +124,7 @@ curl -X POST https://your-api.example.com/api/auth/login \
 - Refresh access token (send cookie):
 
 ```bash
-curl -X POST https://your-api.example.com/api/auth/refresh-token \
+curl -X POST https://dev-pulse-navy.vercel.app/api/auth/refresh-token \
   -b cookies.txt
 ```
 
@@ -133,7 +133,7 @@ This returns a JSON with a new access token which you can use in the `Authorizat
 Example protected update (use `$ACCESS_TOKEN`):
 
 ```bash
-curl -X PATCH https://your-api.example.com/api/issues/1 \
+curl -X PATCH https://dev-pulse-navy.vercel.app/api/issues/1 \
   -H "Authorization: Bearer $ACCESS_TOKEN" \
   -H "Content-Type: application/json" \
   -d '{"title":"Updated title","description":"Updated description with >=20 chars","status":"in_progress"}'
@@ -219,4 +219,4 @@ curl -X PATCH https://your-api.example.com/api/issues/1 \
 
 - ✅ **GitHub Repo (Public):** <https://github.com/Maptaul/DevPulse>
 - ✅ **Live Deployment (Public):** <https://dev-pulse-navy.vercel.app>
-- ✅ **Interview Video (Public):** <https://drive.google.com/...> or <https://youtu.be/...>
+- ✅ **Interview Video (Public):** <https://drive.google.com/drive/folders/1SKblAdWRcC9108lJ8sIVzqJty67V-3FB?usp=sharing>
