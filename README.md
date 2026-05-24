@@ -2,7 +2,7 @@
 
 A RESTful issue tracking API built with Node.js, TypeScript, Express, and PostgreSQL.
 
-**Live URL:** _https://your-deployed-url.com_
+**Live URL:** https://dev-pulse-navy.vercel.app
 
 ---
 
@@ -21,15 +21,15 @@ A RESTful issue tracking API built with Node.js, TypeScript, Express, and Postgr
 
 ## Tech Stack
 
-| Layer        | Technology                    |
-| ------------ | ----------------------------- |
-| Runtime      | Node.js 24.x                  |
-| Language     | TypeScript                    |
-| Framework    | Express 5                     |
-| Database     | PostgreSQL (via `pg`)         |
-| Auth         | jsonwebtoken                  |
-| Password     | bcryptjs (salt rounds: 10)    |
-| Dev Tools    | tsx                           |
+| Layer     | Technology                 |
+| --------- | -------------------------- |
+| Runtime   | Node.js 24.x               |
+| Language  | TypeScript                 |
+| Framework | Express 5                  |
+| Database  | PostgreSQL (via `pg`)      |
+| Auth      | jsonwebtoken               |
+| Password  | bcryptjs (salt rounds: 10) |
+| Dev Tools | tsx                        |
 
 ---
 
@@ -38,7 +38,7 @@ A RESTful issue tracking API built with Node.js, TypeScript, Express, and Postgr
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/devpulse.git
+git clone https://github.com/Maptaul/DevPulse
 cd devpulse
 ```
 
@@ -101,10 +101,43 @@ npm run dev
 
 ### Auth
 
-| Method | Endpoint           | Description          | Access |
-| ------ | ------------------ | -------------------- | ------ |
-| POST   | `/api/auth/signup` | Register a new user  | Public |
-| POST   | `/api/auth/login`  | Login and get token  | Public |
+| Method | Endpoint           | Description         | Access |
+| ------ | ------------------ | ------------------- | ------ |
+| POST   | `/api/auth/signup` | Register a new user | Public |
+| POST   | `/api/auth/login`  | Login and get token | Public |
+
+Additional auth details:
+
+- `POST /api/auth/refresh-token` — Exchange the refresh token cookie for a new access token. The refresh token is set as an `httpOnly` cookie by the login endpoint.
+
+Login sets a `refreshToken` cookie (httpOnly). Example flows using `curl`:
+
+- Login (store cookies in `cookies.txt`):
+
+```bash
+curl -X POST https://your-api.example.com/api/auth/login \
+  -H "Content-Type: application/json" \
+  -c cookies.txt \
+  -d '{"email":"user@example.com","password":"password"}'
+```
+
+- Refresh access token (send cookie):
+
+```bash
+curl -X POST https://your-api.example.com/api/auth/refresh-token \
+  -b cookies.txt
+```
+
+This returns a JSON with a new access token which you can use in the `Authorization` header for protected endpoints.
+
+Example protected update (use `$ACCESS_TOKEN`):
+
+```bash
+curl -X PATCH https://your-api.example.com/api/issues/1 \
+  -H "Authorization: Bearer $ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Updated title","description":"Updated description with >=20 chars","status":"in_progress"}'
+```
 
 ### Issues
 
@@ -118,11 +151,11 @@ npm run dev
 
 **Query params for `GET /api/issues`:**
 
-| Param    | Values                              | Default   |
-| -------- | ----------------------------------- | --------- |
-| `sort`   | `newest`, `oldest`                  | `newest`  |
-| `type`   | `bug`, `feature_request`            | —         |
-| `status` | `open`, `in_progress`, `resolved`   | —         |
+| Param    | Values                            | Default  |
+| -------- | --------------------------------- | -------- |
+| `sort`   | `newest`, `oldest`                | `newest` |
+| `type`   | `bug`, `feature_request`          | —        |
+| `status` | `open`, `in_progress`, `resolved` | —        |
 
 ---
 
@@ -142,48 +175,48 @@ npm run dev
 
 ### `issues`
 
-| Column      | Type         | Notes                                               |
-| ----------- | ------------ | --------------------------------------------------- |
-| id          | SERIAL PK    | Auto-increment                                      |
-| title       | VARCHAR(150) | Required, max 150 characters                        |
-| description | TEXT         | Required, min 20 characters                         |
-| type        | VARCHAR      | `bug` or `feature_request`                          |
-| status      | VARCHAR      | `open`, `in_progress`, `resolved`; default `open`   |
-| reporter_id | INTEGER      | References user id (validated in app logic)         |
-| created_at  | TIMESTAMPTZ  | Auto-generated                                      |
-| updated_at  | TIMESTAMPTZ  | Auto-updated                                        |
+| Column      | Type         | Notes                                             |
+| ----------- | ------------ | ------------------------------------------------- |
+| id          | SERIAL PK    | Auto-increment                                    |
+| title       | VARCHAR(150) | Required, max 150 characters                      |
+| description | TEXT         | Required, min 20 characters                       |
+| type        | VARCHAR      | `bug` or `feature_request`                        |
+| status      | VARCHAR      | `open`, `in_progress`, `resolved`; default `open` |
+| reporter_id | INTEGER      | References user id (validated in app logic)       |
+| created_at  | TIMESTAMPTZ  | Auto-generated                                    |
+| updated_at  | TIMESTAMPTZ  | Auto-updated                                      |
 
 ---
 
 ## Roles & Permissions
 
-| Action                              | contributor | maintainer |
-| ----------------------------------- | :---------: | :--------: |
-| Signup / Login                      | ✅          | ✅         |
-| Create issue                        | ✅          | ✅         |
-| View all issues / single issue      | ✅          | ✅         |
-| Update own open issues              | ✅          | ✅         |
-| Update any issue                    | ❌          | ✅         |
-| Delete any issue                    | ❌          | ✅         |
-| Change issue status                 | ❌          | ✅         |
+| Action                         | contributor | maintainer |
+| ------------------------------ | :---------: | :--------: |
+| Signup / Login                 |     ✅      |     ✅     |
+| Create issue                   |     ✅      |     ✅     |
+| View all issues / single issue |     ✅      |     ✅     |
+| Update own open issues         |     ✅      |     ✅     |
+| Update any issue               |     ❌      |     ✅     |
+| Delete any issue               |     ❌      |     ✅     |
+| Change issue status            |     ❌      |     ✅     |
 
 ---
 
 ## Error Responses
 
-| Status | Meaning                              |
-| ------ | ------------------------------------ |
-| 400    | Validation error / duplicate email   |
-| 401    | Missing, expired, or invalid token   |
-| 403    | Insufficient role / permission       |
-| 404    | Resource not found                   |
-| 409    | Business logic conflict              |
-| 500    | Unexpected server error              |
+| Status | Meaning                            |
+| ------ | ---------------------------------- |
+| 400    | Validation error / duplicate email |
+| 401    | Missing, expired, or invalid token |
+| 403    | Insufficient role / permission     |
+| 404    | Resource not found                 |
+| 409    | Business logic conflict            |
+| 500    | Unexpected server error            |
 
 ---
 
 ## Submission
 
-- ✅ **GitHub Repo (Public):** <https://github.com/yourusername/devpulse>
-- ✅ **Live Deployment (Public):** <https://devpulse-api.vercel.app>
+- ✅ **GitHub Repo (Public):** <https://github.com/Maptaul/DevPulse>
+- ✅ **Live Deployment (Public):** <https://dev-pulse-navy.vercel.app>
 - ✅ **Interview Video (Public):** <https://drive.google.com/...> or <https://youtu.be/...>
