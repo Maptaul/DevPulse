@@ -19,10 +19,9 @@ IP     : ${req.ip}
     }
   });
 
-  console.log(`📌 ${req.method} ${req.originalUrl}`);
+  // console.log(`📌 ${req.method} ${req.originalUrl}`);
 
   next();
 };
-
 
 export default logger;

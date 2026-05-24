@@ -19,10 +19,34 @@ const signupUser = async (req: Request, res: Response, next: NextFunction) => {
 const loginUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const result = await authService.loginUserIntoDB(req.body);
+    const { refreshToken, accessToken } = result;
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+    });
+
     sendResponse(res, {
       success: true,
       statusCode: 200,
       message: "User logged in successfully",
+      data: { accessToken },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const refreshToken = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const result = await authService.generateRefreshToken(
+      req.cookies.refreshToken,
+    );
+    sendResponse(res, {
+      success: true,
+      statusCode: 200,
+      message: "AccessToken generated successfully",
       data: result,
     });
   } catch (error) {
@@ -33,4 +57,5 @@ const loginUser = async (req: Request, res: Response, next: NextFunction) => {
 export const authController = {
   signupUser,
   loginUser,
+  refreshToken,
 };
