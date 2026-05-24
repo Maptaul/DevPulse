@@ -82,9 +82,7 @@ const getAllIssuesFromDB = async (filters: {
     [reporterIds],
   );
 
-  const reporterMap = new Map(
-    reportersResult.rows.map((r) => [r.id, r]),
-  );
+  const reporterMap = new Map(reportersResult.rows.map((r) => [r.id, r]));
 
   const rows = issues.map(({ reporter_id, ...issue }) => ({
     ...issue,
@@ -120,7 +118,11 @@ const updateIssueIntoDB = async (id: number, payload: IUpdateIssuePayload) => {
     throw new AppError("Issue not found", 404);
   }
 
-  const { title, description, type, status } = payload;
+  const { title, description, type } = payload;
+
+  if ("status" in payload) {
+    throw new AppError("Status cannot be updated through this endpoint", 400);
+  }
 
   if (title !== undefined && title.length > 150) {
     throw new AppError("Title must be at most 150 characters", 400);
@@ -131,20 +133,16 @@ const updateIssueIntoDB = async (id: number, payload: IUpdateIssuePayload) => {
   if (type !== undefined && !VALID_TYPES.includes(type)) {
     throw new AppError("Type must be bug or feature_request", 400);
   }
-  if (status !== undefined && !VALID_STATUSES.includes(status)) {
-    throw new AppError("Status must be open, in_progress, or resolved", 400);
-  }
 
   const result = await pool.query(
     `UPDATE issues
      SET title = COALESCE($1, title),
          description = COALESCE($2, description),
          type = COALESCE($3, type),
-         status = COALESCE($4, status),
          updated_at = NOW()
-     WHERE id = $5
+     WHERE id = $4
      RETURNING *`,
-    [title, description, type, status, id],
+    [title, description, type, id],
   );
 
   return result;

@@ -2,10 +2,10 @@ export type IssueType = "bug" | "feature_request";
 export type IssueStatus = "open" | "in_progress" | "resolved";
 
 export interface ICreateIssuePayload {
-  title: string; 
-  description: string; 
+  title: string;
+  description: string;
   type: IssueType;
-  status?: IssueStatus; 
+  status?: IssueStatus;
   reporter_id: number;
 }
 
@@ -13,7 +13,6 @@ export interface IUpdateIssuePayload {
   title?: string;
   description?: string;
   type?: IssueType;
-  status?: IssueStatus;
 }
 
 export interface IIssue {
