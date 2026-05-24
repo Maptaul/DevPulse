@@ -4,7 +4,10 @@ import { issueService } from "./issues.service";
 
 const createIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await issueService.createIssueIntoDB(req.body);
+    const result = await issueService.createIssueIntoDB({
+      ...req.body,
+      reporter_id: req.user?.id,
+    });
     sendResponse(res, {
       success: true,
       statusCode: 201,
@@ -29,7 +32,7 @@ const getAllIssues = async (req: Request, res: Response, next: NextFunction) => 
     sendResponse(res, {
       success: true,
       statusCode: 200,
-      message: "Issues retrieved successfully",
+      message: "Issues retrived successfully",
       data: result.rows,
     });
   } catch (error) {
@@ -43,7 +46,7 @@ const getIssueById = async (req: Request, res: Response, next: NextFunction) => 
     sendResponse(res, {
       success: true,
       statusCode: 200,
-      message: "Issue retrieved successfully",
+      message: "Issue retrived successfully",
       data: result.rows[0],
     });
   } catch (error) {
@@ -53,7 +56,22 @@ const getIssueById = async (req: Request, res: Response, next: NextFunction) => 
 
 const updateIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await issueService.updateIssueIntoDB(Number(req.params.id), req.body);
+    const id = Number(req.params.id);
+    const existing = await issueService.getIssueByIdFromDB(id);
+    const issue = existing.rows[0];
+
+    const user = req.user;
+
+    if (user?.role === "contributor") {
+      if (issue.reporter?.id !== user.id) {
+        return res.status(403).json({ success: false, message: "Forbidden" });
+      }
+      if (issue.status !== "open") {
+        return res.status(409).json({ success: false, message: "Only open issues can be updated" });
+      }
+    }
+
+    const result = await issueService.updateIssueIntoDB(id, req.body);
     sendResponse(res, {
       success: true,
       statusCode: 200,
@@ -67,12 +85,11 @@ const updateIssue = async (req: Request, res: Response, next: NextFunction) => {
 
 const deleteIssue = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const result = await issueService.deleteIssueFromDB(Number(req.params.id));
+    await issueService.deleteIssueFromDB(Number(req.params.id));
     sendResponse(res, {
       success: true,
       statusCode: 200,
       message: "Issue deleted successfully",
-      data: result.rows[0],
     });
   } catch (error) {
     next(error);

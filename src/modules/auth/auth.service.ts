@@ -4,6 +4,7 @@ import { pool } from "../../db";
 import type { ILoginPayload, ISignupPayload } from "./auth.interface";
 import config from "../../config";
 import { generateAccessToken, generateTokens, type TTokenPayload } from "../../utility/tokenGenerator";
+import AppError from "../../utility/AppError";
 
 const signupUserIntoDB = async (payload: ISignupPayload) => {
   const { name, email, password, role = "contributor" } = payload;
@@ -13,7 +14,7 @@ const signupUserIntoDB = async (payload: ISignupPayload) => {
   ]);
 
   if (existing.rows.length > 0) {
-    throw new Error("Email already in use");
+    throw new AppError("Email already in use", 400);
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
@@ -21,7 +22,7 @@ const signupUserIntoDB = async (payload: ISignupPayload) => {
   const result = await pool.query(
     `INSERT INTO users (name, email, password, role)
      VALUES ($1, $2, $3, $4)
-     RETURNING id, name, email, role, created_at`,
+     RETURNING id, name, email, role, created_at, updated_at`,
     [name, email, hashedPassword, role],
   );
 
@@ -36,14 +37,14 @@ const loginUserIntoDB = async (payload: ILoginPayload) => {
   ]);
 
   if (userData.rows.length === 0) {
-    throw new Error("Invalid email or password");
+    throw new AppError("Invalid email or password", 401);
   }
 
   const user = userData.rows[0];
   const matchPassword = await bcrypt.compare(password, user.password);
 
   if (!matchPassword) {
-    throw new Error("Invalid email or password");
+    throw new AppError("Invalid email or password", 401);
   }
 
   const jwtPayload: TTokenPayload = {
@@ -55,12 +56,14 @@ const loginUserIntoDB = async (payload: ILoginPayload) => {
 
   const { accessToken, refreshToken } = generateTokens(jwtPayload);
 
-  return { accessToken, refreshToken };
+  const { password: _, ...userWithoutPassword } = user;
+
+  return { accessToken, refreshToken, user: userWithoutPassword };
 };
 
 const generateRefreshToken = async (token: string) => {
   if (!token) {
-    throw new Error("Unauthorized");
+    throw new AppError("Unauthorized", 401);
   }
 
   const decoded = jwt.verify(
@@ -73,7 +76,7 @@ const generateRefreshToken = async (token: string) => {
   ]);
 
   if (userData.rows.length === 0) {
-    throw new Error("User not found");
+    throw new AppError("User not found", 404);
   }
 
   const user = userData.rows[0];

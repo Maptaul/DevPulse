@@ -1,6 +1,5 @@
 import express, {
   type Application,
-  type NextFunction,
   type Request,
   type Response,
 } from "express";
@@ -18,21 +17,19 @@ import logger from "./middleware/logger";
 const app: Application = express();
 
 app.use(express.json());
-
-app.use(CookieParser());
-app.use(express.json());
 app.use(express.text());
 app.use(express.urlencoded({ extended: true }));
+app.use(CookieParser());
 
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: process.env.CORS_ORIGIN || "*",
   }),
 );
 
 app.use(logger);
 
-app.get("/", (req: Request, res: Response) => {
+app.get("/", (_req: Request, res: Response) => {
   sendResponse(res, {
     success: true,
     message: "Hello, DevPulse World!",

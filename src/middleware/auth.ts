@@ -7,7 +7,10 @@ import type { ROLES } from "../types";
 const auth = (roles: ROLES[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const token = req.headers.authorization?.split(" ")[1];
+      const authHeader = req.headers.authorization;
+      const token = authHeader?.startsWith("Bearer ")
+        ? authHeader.split(" ")[1]
+        : authHeader;
 
       if (!token) {
         return res
@@ -40,6 +43,12 @@ const auth = (roles: ROLES[]) => {
       req.user = user;
       next();
     } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        return res.status(401).json({ success: false, message: "Token expired" });
+      }
+      if (error instanceof jwt.JsonWebTokenError) {
+        return res.status(401).json({ success: false, message: "Invalid token" });
+      }
       next(error);
     }
   };

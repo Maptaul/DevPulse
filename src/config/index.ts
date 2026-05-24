@@ -12,6 +12,7 @@ const config = {
   refresh_secret: process.env.JWT_REFRESH_SECRET,
   accessTokenExpiry: process.env.JWT_ACCESS_EXPIRY as string,
   refreshTokenExpiry: process.env.JWT_REFRESH_EXPIRY as string,
+  CORS_ORIGIN: process.env.CORS_ORIGIN as string,
 };
 
 export default config;
