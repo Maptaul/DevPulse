@@ -5,7 +5,6 @@ type TTokenPayload = {
   id: number;
   name: string;
   role: string | null;
-  is_active: boolean;
   email: string;
 };
 
