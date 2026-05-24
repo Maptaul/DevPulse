@@ -26,11 +26,13 @@ const getSingleUserFromDB = async (id: string) => {
 };
 
 const updateUserFromDB = async (payload: ICreateUserPayload, id: string) => {
-  const { name, password, role } = payload;
-  const hashPassword = await bcrypt.hash(password, 10);
+  if (payload.password) {
+    payload.password = await bcrypt.hash(payload.password, 10);
+  }
+  
   const result = await pool.query(
     `UPDATE users SET name =COALESCE($1, name), password = COALESCE($2, password),role = COALESCE($3, role) WHERE id = $4 RETURNING * `,
-    [name, hashPassword, role, id],
+    [payload.name, payload.password, payload.role, id],
   );
   delete result.rows[0].password;
   return result;

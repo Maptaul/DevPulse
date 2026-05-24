@@ -58,7 +58,6 @@ const getSingleUser = async (
 
 const updateUser = async (req: Request, res: Response, next: NextFunction) => {
   const { id } = req.params;
-  const { name, password, role } = req.body;
   try {
     const result = await userService.updateUserFromDB(req.body, id as string);
     if (result.rows.length === 0) {
